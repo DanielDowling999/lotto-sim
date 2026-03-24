@@ -35,11 +35,11 @@ function playGame(){
 function generateLine(){
     const ballRange = 40;
     const powerBallRange = 10;
+    const ballNo  = 6;
     let balls=[];
-    for(let i = 0; i<6; i++){
-        balls.push(generateBall(ballRange));
-    }
-    balls.push(generateBall(powerBallRange));
+
+    balls = shuffleArrayAndSlice(ballNo, ballRange);
+    balls.push(shuffleArrayAndSlice(1, 10));
 
     return balls;
 }
@@ -48,3 +48,18 @@ function generateBall(numRange){
     const ball = Math.floor(Math.random()*numRange)+1;
     return ball;
 }
+
+function shuffleArrayAndSlice(count, max){
+    const rangeSize = max;
+
+    const numbers = Array.from({length: rangeSize}, (_, index) => index+1);
+    for (let i = rangeSize - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i+1));
+        [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+    }
+    return numbers.slice(0, count);
+
+
+}
+
+
