@@ -8,12 +8,24 @@
     --light-main-color:#F9EC82;
     --powerball-color: #1F6CF1;
     --dark-background-color:#121212;
-    --light-background-color:#E0E0E0;
+    --light-background-color:#F4F4F0;
+    --card-background-color:#FFFFFF;
+    --card-header-color:#F7F7F3;
+    --border-color:#E0E0E0;
+    --lighter-border-color:#E8E8E8;
+
+    --primary-text-color:#111111;
+    --secondary-text-color:#333333;
+    --muted-text-color:#555555;
+    --muted-text-lighter-color:#777777;
+    --label-text-color:#AAAAAA;
+    --label-faint-color:#BBBBBB;
+    --near-black-color:#1A1A1A;
 }
 
 body{
     background-color: var(--light-background-color);
-    color:var(--dark-background-color);
+    color:var(--primary-text-color);
 }
 
 
@@ -45,3 +57,34 @@ body{
     border:none;
 }
 
+#mainContent{
+    display:grid;
+    grid-template-columns: [main] 80% [sidebar] 20%;
+}
+#main{
+    display:flex;
+    flex-direction:column;
+}
+#winningNumberSection{
+    border:4px black solid;
+    border-radius:10px;
+}
+#winningHeading{
+    border-bottom:4px black solid;
+    display:flex;
+    justify-content: space-between;
+}
+#winningHeading h3{
+    color:var(--powerball-color);
+}
+
+h4{
+    color: var(--border-color);
+}
+
+
+#winningBallsSection{
+    display:flex;
+    flex-direction:row;
+    background-color: white;
+}
