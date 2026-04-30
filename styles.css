@@ -24,11 +24,16 @@
     --label-text-color:#AAAAAA;
     --label-faint-color:#BBBBBB;
     --near-black-color:#1A1A1A;
+
 }
 
 body{
     background-color: var(--light-background-color);
     color:var(--primary-text-color);
+}
+
+button{
+    all:unset;
 }
 
 
@@ -63,14 +68,19 @@ body{
 #mainContent{
     display:grid;
     grid-template-columns: [main] 80% [sidebar] 20%;
+    padding-top:20px;
 }
 #main{
     display:flex;
     flex-direction:column;
+    align-items:center;
+    gap:20px;
 }
 #winningNumberSection{
     border:4px black solid;
     border-radius:10px;
+    width:80%;
+    min-width:fit-content;
 }
 #winningHeading{
     border-bottom:4px black solid;
@@ -85,18 +95,16 @@ h4{
     color: var(--border-color);
 }
 
-
 #winningBallsSection{
     display:flex;
     flex-direction:row;
     background-color: white;
     justify-content: space-around;
-
 }
 
 .ball{
-    height:100px;
-    width:100px;
+    height:60px;
+    width:60px;
     background-color:var(--light-main-color);
     border-radius: 50%;
     display:flex;
@@ -106,7 +114,64 @@ h4{
 
 }
 
-.powerball{
+#winningBallsSection .ball{
+    height:100px;
+    width:100px;
+}
+
+.powerball.ball{
     background-color:var(--powerball-color);
     border-color: var(--powerball-border-color);
+}
+
+#playerTicketSection {
+    border: 4px black solid;
+    border-radius: 10px;
+    width:80%; 
+    min-width: fit-content;
+    
+}
+
+#playerTickets{
+    display:flex;
+    gap:20px;
+}
+
+.ticket{
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content: space-between;
+    padding:20px;
+    background-color:green;
+    min-height:50px;
+}
+
+
+#playerTickets{
+    display:flex;
+    flex-direction:column;
+    
+}
+
+.ticketBalls{
+    display:flex;
+    justify-content:space-around;
+    gap:10px;
+}
+
+.ticketEnd{
+    display:flex;
+    gap:20px;
+}
+
+#buyAnother{
+    border:2px dashed black;
+    border-radius:10px;
+}
+
+.ballSection.powerball {
+    border-left: 2px solid #d8d8d8;
+    padding-left: 16px;
+    margin-left: 8px;
 }
