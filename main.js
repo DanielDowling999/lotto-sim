@@ -39,7 +39,7 @@ function generateLine(){
     let balls=[];
 
     balls = shuffleArrayAndSlice(ballNo, ballRange);
-    balls.push(shuffleArrayAndSlice(1, 10));
+    balls.push(shuffleArrayAndSlice(1, powerBallRange)[0]);
 
     return balls;
 }
@@ -63,3 +63,4 @@ function shuffleArrayAndSlice(count, max){
 }
 
 
+module.exports = { generateLine, shuffleArrayAndSlice, generateBall };
