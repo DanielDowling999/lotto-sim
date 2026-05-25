@@ -25,3 +25,10 @@ test('regular balls are unique', () => {
     const regular=line.slice(0,6);
     expect(new Set(regular).size).toBe(6);
 })
+
+//Ticket match
+test('No matching numbers returns with 0 matched', () => {
+    const line = [1, 2, 3, 4, 5, 6, 7];
+    const winningNumbers = [8, 9, 10, 11, 12, 13, 9];
+    expect(checkTicketMatch(winningNumbers, line)).toEqual(0);
+})

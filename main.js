@@ -63,4 +63,4 @@ function shuffleArrayAndSlice(count, max){
 }
 
 
-module.exports = { generateLine, shuffleArrayAndSlice, generateBall };
+module.exports = { generateLine, shuffleArrayAndSlice, generateBall  };
