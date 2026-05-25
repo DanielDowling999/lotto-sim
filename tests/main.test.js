@@ -1,4 +1,4 @@
-const {generateLine, shuffleArrayAndSlice, generateBall} = require('../main');
+const {generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch} = require('../main');
 
 //Ball Generation Tests
 test('generate line returns 7 numbers', () => {

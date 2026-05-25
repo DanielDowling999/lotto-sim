@@ -62,5 +62,10 @@ function shuffleArrayAndSlice(count, max){
 
 }
 
+function checkTicketMatch(winningNumbers, ticket){
+    let matchCount = 0;
+    return matchCount;
+}
 
-module.exports = { generateLine, shuffleArrayAndSlice, generateBall  };
+
+module.exports = { generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch  };
