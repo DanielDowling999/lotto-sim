@@ -1,4 +1,4 @@
-const {generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch} = require('../main');
+const {generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot} = require('../main');
 
 //Ball Generation Tests
 test('generate line returns 7 numbers', () => {
@@ -63,9 +63,62 @@ test('Powerball only matches with powerball', () => {
     expect(checkPowerballMatch(winningNumbers, ticket)).toEqual(0);
 })
 
+
 test('Jackpot win with all numbers and powerball matching', () => {
     const ticket = [1, 2, 3, 4, 5, 6, 7];
     const winningNumbers = [1, 2, 3, 4, 5, 6, 7];
     expect(checkTicketMatch(winningNumbers, ticket)).toEqual(6);
     expect(checkPowerballMatch(winningNumbers, ticket)).toEqual(1);
+})
+
+test('No matches returns $0', () => {
+    const ticket = [1, 2, 3, 4, 5, 6, 7];
+    const winningNumbers = [8, 9, 10, 11, 12, 13, 9];
+    expect(calculatePrize(winningNumbers, ticket)).toEqual(0);
+})
+
+test('One match returns $0', () => {
+    const ticket = [1, 2, 3, 4, 5, 6, 7];
+    const winningNumbers = [1, 8, 9, 10, 11, 12, 9];
+    expect(calculatePrize(winningNumbers, ticket)).toEqual(0);
+})
+
+test('three regular matches returns minimum prize', () => {
+    const ticket = [1, 2, 3, 4, 5, 6, 7];
+    const winningNumbers = [1, 2, 3, 10, 11, 12, 9];
+    const expectedPrize = Math.floor(getJackpot()*getMultiplier(3, 0).prizeMult);
+    expect(calculatePrize(winningNumbers, ticket)).toEqual(expectedPrize);
+})
+
+test('Powerball increases minimum prize', () => {
+    const ticket = [1, 2, 3, 4, 5, 6, 7];
+    const winningNumbers = [1, 2, 3, 10, 11, 12, 7];
+    const expectedPrize = Math.floor(getJackpot()*getMultiplier(3, 1).prizeMult);
+    expect(calculatePrize(winningNumbers, ticket)).toEqual(expectedPrize);
+})
+
+test('Two matches returns $0', () => {
+    const ticket = [1, 2, 3, 4, 5, 6, 7];
+    const winningNumbers = [1, 2, 8, 9, 10, 11, 9];
+    expect(calculatePrize(winningNumbers, ticket)).toEqual(0);
+})
+
+test('Powerball only returns $0', () => {
+    const ticket = [1, 2, 3, 4, 5, 6, 7];
+    const winningNumbers = [8, 9, 10, 11, 12, 13, 7];
+    expect(calculatePrize(winningNumbers, ticket)).toEqual(0);
+})
+
+test('Six matches no powerball returns correct prize', () => {
+    const ticket = [1, 2, 3, 4, 5, 6, 7];
+    const winningNumbers = [1, 2, 3, 4, 5, 6, 9];
+    const expectedPrize = Math.floor(getJackpot() * getMultiplier(6, 0).prizeMult);
+    expect(calculatePrize(winningNumbers, ticket)).toEqual(expectedPrize);
+})
+
+test('Jackpot win returns jackpot amount', () => {
+    const ticket = [1, 2, 3, 4, 5, 6, 7];
+    const winningNumber =[1, 2, 3, 4, 5, 6, 7];
+    const expectedPrize = getJackpot();
+    expect(calculatePrize(winningNumber, ticket)).toEqual(expectedPrize);
 })

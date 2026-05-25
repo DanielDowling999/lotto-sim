@@ -1,4 +1,17 @@
 //Basic prototype. Game functionality will be split between a player object and game object, just wanted to test things first.
+const PRIZE_TABLE = [
+    {regularMatches: 6, powerballMatch: true, prizeMult: 1},
+    {regularMatches: 6, powerballMatch: false, prizeMult:0.2},
+    {regularMatches: 5, powerballMatch: true, prizeMult: 0.01},
+    {regularMatches: 5, powerballMatch: false, prizeMult: 0.0005},
+    {regularMatches:4, powerballMatch: true, prizeMult: 0.0001},
+    {regularMatches:4, powerballMatch: false, prizeMult: 0.00003},
+    {regularMatches:3, powerballMatch: true, prizeMult:0.000016},
+    {regularMatches:3, powerballMatch: false, prizeMult: 0.000008},
+];
+
+let jackpot = 4000000;
+
 
 function playGame(){
     const playerdiv=document.getElementById('player');
@@ -79,5 +92,24 @@ function checkPowerballMatch(winningNumbers, ticket){
     return 0;
 }
 
+function getMultiplier(matchCount, powerballMatch){
+    return result = PRIZE_TABLE.find(row => row.regularMatches === matchCount && row.powerballMatch=== Boolean(powerballMatch));
 
-module.exports = { generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch  };
+}
+
+function getJackpot(){
+    return jackpot;
+}
+
+function calculatePrize(winningNumbers, ticket){
+    const matchCount = checkTicketMatch(winningNumbers, ticket);
+    const powerballMatch = checkPowerballMatch(winningNumbers, ticket);
+    const result = getMultiplier(matchCount, powerballMatch);
+    if (result){
+        return Math.floor(getJackpot()*result.prizeMult);
+    }
+    return 0;
+    
+}
+
+module.exports = { generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot  };
