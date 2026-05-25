@@ -64,8 +64,20 @@ function shuffleArrayAndSlice(count, max){
 
 function checkTicketMatch(winningNumbers, ticket){
     let matchCount = 0;
+    for(let i =0; i< 6; i++){
+        if (winningNumbers.includes(ticket[i])){
+            matchCount+=1;
+        }
+    }
     return matchCount;
 }
 
+function checkPowerballMatch(winningNumbers, ticket){
+    if (winningNumbers[6] === ticket[6]){
+        return 1;
+    }
+    return 0;
+}
 
-module.exports = { generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch  };
+
+module.exports = { generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch  };
