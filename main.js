@@ -11,9 +11,76 @@ const PRIZE_TABLE = [
 ];
 
 let jackpot = 4000000;
+let maxJackpot = 50000000;
+
+class LottoGame {
+    constructor() {
+        this.defaultJackpot = 4000000;
+        this.jackpot = this.defaultJackpot;
+        this.drawNumber = 0;
+        this.winningNumbers=[];
+    }
+    getJackpot(){
+        return this.jackpot;
+    }
+
+    increaseJackpot(num = 1000000){
+        this.jackpot+=num;
+    }
+    resetJackpot(){
+        this.jackpot=this.defaultJackpot;
+    }
+    generateWinningLine(){
+        this.winningNumbers=generateLine();
+        return this.winningNumbers;
+    }
+
+    playGame(player, winningNumbers = this.generateWinningLine()){
+        this.drawNumber+=1;
+        let totalPrize = 0;
+        let jackpotWon = false;
+        player.tickets.forEach(ticket =>{
+            jackpotWon = checkTicketMatch(winningNumbers, ticket) === 6 && checkPowerballMatch(winningNumbers, ticket) === 1;
+            let prize = calculatePrize(winningNumbers, ticket);
+            totalPrize+=prize;
+        })
+        player.updateMoney(totalPrize);
+        if (jackpotWon){
+            this.resetJackpot();
+        }
+        else{
+            this.increaseJackpot();
+
+        }
 
 
-function playGame(){
+    }
+    
+}
+
+class LottoPlayer {
+    constructor(){
+        this.currentMoney = 100;
+        this.totalSpent = 0;
+        this.totalWon = 0;
+        this.tickets = [];
+    }
+    getMoney(){
+        return this.currentMoney;
+    }
+    addTicket(ticket){
+        this.tickets.push(ticket);
+    }
+    buyTicket(){
+        const ticket = generateLine();
+        this.addTicket(ticket);
+    }
+    updateMoney(amount){
+        this.currentMoney+=amount;
+    }
+}
+
+/*function playGame(){
     const playerdiv=document.getElementById('player');
     const lottodiv = document.getElementById('lotto');
     const windiv = document.getElementById('win');
@@ -43,7 +110,7 @@ function playGame(){
 
     win = arraysMatch(yourLine, winningLine);
     windiv.innerHTML=win;
-}
+}*/
 
 function generateLine(){
     const ballRange = 40;
@@ -112,4 +179,4 @@ function calculatePrize(winningNumbers, ticket){
     
 }
 
-module.exports = { generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot  };
+module.exports = { LottoGame, LottoPlayer, generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot  };

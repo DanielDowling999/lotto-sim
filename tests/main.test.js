@@ -1,4 +1,4 @@
-const {generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot} = require('../main');
+const {LottoGame, LottoPlayer, generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot} = require('../main');
 
 //Ball Generation Tests
 test('generate line returns 7 numbers', () => {
@@ -121,4 +121,54 @@ test('Jackpot win returns jackpot amount', () => {
     const winningNumber =[1, 2, 3, 4, 5, 6, 7];
     const expectedPrize = getJackpot();
     expect(calculatePrize(winningNumber, ticket)).toEqual(expectedPrize);
+})
+
+//Testing LottoGame class
+let game;
+let player;
+beforeEach(() => {
+    game = new LottoGame();
+    player = new LottoPlayer();
+});
+
+test('Jackpot increases', () => {
+    const initialJackpot = game.getJackpot();
+    game.increaseJackpot(1000000);
+    expect(game.getJackpot()).toEqual(initialJackpot + 1000000);
+})
+
+test('Jackpot resets', () => {
+    const initialJackpot=game.getJackpot();
+    game.increaseJackpot(1000000);
+    game.resetJackpot();
+    expect(game.getJackpot()).toEqual(initialJackpot);
+})
+
+test('playGame returns a winning line of numbers', () => {
+    game.playGame(player);
+    expect(game.winningNumbers).toHaveLength(7);
+})
+
+test('jackpot resets on win', () => {
+    const initialJackpot = game.getJackpot();
+    game.increaseJackpot(10000000);
+    player.tickets.push([1, 2, 3, 4, 5, 6, 7]);
+    game.playGame(player, [1, 2, 3, 4, 5, 6, 7]);
+    expect(game.getJackpot()).toEqual(initialJackpot);
+
+})
+
+test('jackpot increases on non-jackpot result', () => {
+    const initialJackpot = game.getJackpot();
+    player.tickets.push([1,2,3,4,5,6,7]);
+    game.playGame(player,[8,9,10,11,12,13,10]);
+    expect(game.getJackpot()).toEqual(initialJackpot + 1000000);
+
+})
+
+test('player money increases on win', () => {
+    const initialMoney = player.getMoney();
+    player.tickets.push([1,2,3,4,5,6,7]);
+    game.playGame(player, [1,2,3,4,5,6,7]);
+    expect(player.getMoney()).toBeGreaterThan(initialMoney);
 })
