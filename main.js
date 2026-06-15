@@ -12,7 +12,7 @@ const PRIZE_TABLE = [
 
 let jackpot = 4000000;
 let maxJackpot = 50000000;
-
+//Making sure password still works on git.
 class LottoGame {
     constructor() {
         this.defaultJackpot = 4000000;
