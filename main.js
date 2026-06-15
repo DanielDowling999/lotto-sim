@@ -19,6 +19,7 @@ class LottoGame {
         this.jackpot = this.defaultJackpot;
         this.drawNumber = 0;
         this.winningNumbers=[];
+        this.ticketPrice = 2;
     }
     getJackpot(){
         return this.jackpot;
@@ -33,6 +34,9 @@ class LottoGame {
     generateWinningLine(){
         this.winningNumbers=generateLine();
         return this.winningNumbers;
+    }
+    getPrice(){
+        return this.ticketPrice;
     }
 
     playGame(player, winningNumbers = this.generateWinningLine()){
@@ -52,8 +56,6 @@ class LottoGame {
             this.increaseJackpot();
 
         }
-
-
     }
     
 }
@@ -71,12 +73,17 @@ class LottoPlayer {
     addTicket(ticket){
         this.tickets.push(ticket);
     }
-    buyTicket(){
+    buyTicket(price = 2){
         const ticket = generateLine();
         this.addTicket(ticket);
+        this.updateMoney(-price);
+        this.totalSpent+=price;
     }
     updateMoney(amount){
         this.currentMoney+=amount;
+        if(amount > 0){
+            this.totalWon+=amount;
+        }
     }
 }
 

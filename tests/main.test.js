@@ -172,3 +172,26 @@ test('player money increases on win', () => {
     game.playGame(player, [1,2,3,4,5,6,7]);
     expect(player.getMoney()).toBeGreaterThan(initialMoney);
 })
+
+test('Player money decreases when buying a ticket', () => {
+    const initialMoney = player.getMoney();
+    const ticketPrice = game.getPrice();
+    player.buyTicket(ticketPrice);
+    expect(player.getMoney()).toEqual(initialMoney - ticketPrice);
+})
+
+test('Player money increases when winning a prize', () => {
+    const initialMoney = player.getMoney();
+    player.tickets.push([1,2,3,4,5,6,7]);
+    game.playGame(player, [1,2,3,4,5,6,7]);
+    expect(player.getMoney()).toBeGreaterThan(initialMoney);
+})
+
+test('Player total spent and total won are tracked correctly', () => {
+    const ticketPrice = game.getPrice();
+    player.buyTicket(ticketPrice);
+    expect(player.totalSpent).toEqual(ticketPrice);
+    player.tickets.push([1,2,3,4,5,6,7]);
+    game.playGame(player, [1,2,3,4,5,6,7]);
+    expect(player.totalWon).toBeGreaterThan(0);
+})
