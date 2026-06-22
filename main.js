@@ -12,7 +12,6 @@ const PRIZE_TABLE = [
 
 let jackpot = 4000000;
 let maxJackpot = 50000000;
-//Making sure password still works on git.
 class LottoGame {
     constructor() {
         this.defaultJackpot = 4000000;
@@ -39,15 +38,25 @@ class LottoGame {
         return this.ticketPrice;
     }
 
+    getDrawNumber(){
+        return this.drawNumber;
+    }
+
+    getWinningNumbers(){
+        return this.winningNumbers;
+    }
+
     playGame(player, winningNumbers = this.generateWinningLine()){
         this.drawNumber+=1;
         let totalPrize = 0;
-        let jackpotWon = false;
-        player.tickets.forEach(ticket =>{
-            jackpotWon = checkTicketMatch(winningNumbers, ticket) === 6 && checkPowerballMatch(winningNumbers, ticket) === 1;
-            let prize = calculatePrize(winningNumbers, ticket);
-            totalPrize+=prize;
-        })
+        const results = player.tickets.map(ticket=>{
+            const regularMatches = checkTicketMatch(winningNumbers, ticket);
+            const powerballMatch = checkPowerballMatch(winningNumbers, ticket);
+            const prize = calculatePrize(winningNumbers, ticket);
+            totalPrize += prize;
+            return {ticket, regularMatches, powerballMatch, prize};
+        });
+        const jackpotWon  = results.some(r => r.regularMatches === 6 && r.powerballMatch === 1);
         player.updateMoney(totalPrize);
         if (jackpotWon){
             this.resetJackpot();
@@ -56,6 +65,15 @@ class LottoGame {
             this.increaseJackpot();
 
         }
+        player.updateGameOver();
+        player.clearTickets();
+        return {
+            winningNumbers,
+            results,
+            totalPrize,
+            jackpotWon,
+            gameOver: player.getGameOver()
+        };
     }
     
 }
@@ -66,6 +84,9 @@ class LottoPlayer {
         this.totalSpent = 0;
         this.totalWon = 0;
         this.tickets = [];
+        this.ticketHistory = [];
+        this.ticketsBought = 0;
+        this.gameOver = false;
     }
     getMoney(){
         return this.currentMoney;
@@ -78,6 +99,7 @@ class LottoPlayer {
         this.addTicket(ticket);
         this.updateMoney(-price);
         this.totalSpent+=price;
+        this.ticketsBought+=1;
     }
     updateMoney(amount){
         this.currentMoney+=amount;
@@ -85,6 +107,32 @@ class LottoPlayer {
             this.totalWon+=amount;
         }
     }
+    getTickets(){
+        return this.tickets;
+    }
+    getTicketHistory(){
+        return this.ticketHistory;
+    }
+    clearTickets(){
+        this.ticketHistory.push(this.tickets);
+        this.tickets = [];
+    }
+    getTicketsBought(){
+        return this.ticketsBought;
+    }
+    updateGameOver(){
+        if(this.currentMoney < 2){
+            this.gameOver = true;
+        }
+        else{
+            this.gameOver = false;
+        }
+    }
+    getGameOver(){
+        return this.gameOver;
+    }
+
+
 }
 
 /*function playGame(){

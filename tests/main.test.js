@@ -195,3 +195,44 @@ test('Player total spent and total won are tracked correctly', () => {
     game.playGame(player, [1,2,3,4,5,6,7]);
     expect(player.totalWon).toBeGreaterThan(0);
 })
+test('jackpot is won if any ticket wins, not just the last', () => {
+    const winningNumbers = [1, 2, 3, 4, 5, 6, 7];
+    player.tickets = [
+        [1, 2, 3, 4, 5, 6, 7], // jackpot winner
+        [8, 9, 10, 11, 12, 13, 9] // no match — this was overwriting jackpotWon
+    ];
+    game.playGame(player, winningNumbers);
+    expect(game.getJackpot()).toEqual(game.defaultJackpot); // should have reset
+});
+
+test('playGame returns correct game over status', () => {
+    player.currentMoney = 0; 
+    player.tickets = [[1,2,3,4,5,6,9]];
+    const result = game.playGame(player, [8, 9, 10, 11, 12, 13, 9]); // No win
+    expect(player.getGameOver()).toBe(true); // Player should be out of money
+});
+
+test('tickets are cleared after each game', () => {
+    player.tickets = [[1,2,3,4,5,6, 9]];
+    game.playGame(player, [8, 9, 10, 11, 12, 13, 9]);
+    expect(player.tickets).toHaveLength(0);
+})
+
+test('cleared tickets are stored in ticket history', () => {
+    player.tickets = [[1,2,3,4,5,6,9]];
+    game.playGame(player, [8, 9, 10, 11, 12, 13, 9]);
+    let ticketHistory = player.getTicketHistory();
+    expect(ticketHistory).toHaveLength(1);
+    expect(ticketHistory[0]).toEqual([[1,2,3,4,5,6,9]]);
+})
+
+test('cleared tickets are stored over multiple rounds', () => {
+    player.tickets = [[1,2,3,4,5,6,9]];
+    game.playGame(player, [8,9,10,11,12,13, 9]);
+    player.tickets = [[2,6,21,22,23,24,1]];
+    game.playGame(player, [1,2,3,4,5,6,7]);
+    let ticketHistory = player.getTicketHistory();
+    expect(ticketHistory).toHaveLength(2);
+    expect(ticketHistory[0]).toEqual([[1,2,3,4,5,6,9]]);
+    expect(ticketHistory[1]).toEqual([[2,6,21,22,23,24,1]]);
+})
