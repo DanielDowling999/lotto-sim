@@ -19,13 +19,18 @@ class LottoGame {
         this.drawNumber = 0;
         this.winningNumbers=[];
         this.ticketPrice = 2;
+        this.basePlayers = 500000;
+        this.ticketsSold = this.determineComputerTickets();
     }
     getJackpot(){
         return this.jackpot;
     }
+    setJackpot(num){
+        this.jackpot = num;
+    }
 
     increaseJackpot(num = 1000000){
-        this.jackpot+=num;
+        this.jackpot = Math.min(this.jackpot + num, maxJackpot);
     }
     resetJackpot(){
         this.jackpot=this.defaultJackpot;
@@ -41,14 +46,40 @@ class LottoGame {
     getDrawNumber(){
         return this.drawNumber;
     }
+    updateDrawNumber(){
+        this.drawNumber +=1;
+    }
 
     getWinningNumbers(){
         return this.winningNumbers;
     }
+    determineNumberOfPlayers(){
+        const k = 1.584;
+        return Math.floor(this.basePlayers * ( 1 + k * Math.log10(this.jackpot/this.defaultJackpot)));        
+    }
+
+    determineComputerTickets(){
+        return this.determineNumberOfPlayers() * 8;
+    }
+
+    updateComputerTickets(){
+        this.ticketsSold = this.determineComputerTickets();
+    }
+
+    determineTotalTickets(playerTickets = 0){
+        return this.ticketsSold + playerTickets;
+    }
+
+    someoneWinsJackpot(){
+        const oddsPerTicket = 1/3838380;
+        const probSomeoneWins = 1 - Math.pow(1-oddsPerTicket, this.ticketsSold);
+        return Math.random() < probSomeoneWins;
+    }
+
 
     playGame(player, winningNumbers = this.generateWinningLine()){
-        this.drawNumber+=1;
         let totalPrize = 0;
+        
         const results = player.tickets.map(ticket=>{
             const regularMatches = checkTicketMatch(winningNumbers, ticket);
             const powerballMatch = checkPowerballMatch(winningNumbers, ticket);
@@ -58,7 +89,9 @@ class LottoGame {
         });
         const jackpotWon  = results.some(r => r.regularMatches === 6 && r.powerballMatch === 1);
         player.updateMoney(totalPrize);
-        if (jackpotWon){
+        
+        const someoneElseWins = this.someoneWinsJackpot();
+        if (jackpotWon || someoneElseWins){
             this.resetJackpot();
         }
         else{
@@ -67,6 +100,9 @@ class LottoGame {
         }
         player.updateGameOver();
         player.clearTickets();
+
+        this.updateDrawNumber();
+        this.updateComputerTickets();
         return {
             winningNumbers,
             results,
@@ -74,6 +110,23 @@ class LottoGame {
             jackpotWon,
             gameOver: player.getGameOver()
         };
+    }
+
+    getGameState(player){
+        return {
+            drawNumber: this.getDrawNumber(),
+            jackpot: this.getJackpot(),
+            winningNumbers: this.getWinningNumbers(),
+            totalTickets: this.determineTotalTickets(player.tickets.length),
+
+            playerMoney: player.getMoney(),
+            totalSpent: player.getTotalSpent(),
+            totalWon: player.getTotalWon(), 
+            ticketsBought: player.getTicketsBought(),
+            playerTickets: player.getTickets(),
+            ticketHistory: player.getTicketHistory(),
+            gameOver: player.getGameOver()
+        }
     }
     
 }
@@ -119,6 +172,10 @@ class LottoPlayer {
     }
     getTicketsBought(){
         return this.ticketsBought;
+    }
+    getTotalSpent(){
+        return this.totalSpent;
+
     }
     updateGameOver(){
         if(this.currentMoney < 2){
