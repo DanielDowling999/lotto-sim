@@ -4,10 +4,10 @@ const PRIZE_TABLE = [
     {regularMatches: 6, powerballMatch: false, prizeMult:0.2},
     {regularMatches: 5, powerballMatch: true, prizeMult: 0.01},
     {regularMatches: 5, powerballMatch: false, prizeMult: 0.0005},
-    {regularMatches:4, powerballMatch: true, prizeMult: 0.0001},
-    {regularMatches:4, powerballMatch: false, prizeMult: 0.00003},
-    {regularMatches:3, powerballMatch: true, prizeMult:0.000016},
-    {regularMatches:3, powerballMatch: false, prizeMult: 0.000008},
+    {regularMatches: 4, powerballMatch: true, prizeMult: 0.0001},
+    {regularMatches: 4, powerballMatch: false, prizeMult: 0.00003},
+    {regularMatches: 3, powerballMatch: true, prizeMult:0.000016},
+    {regularMatches: 3, powerballMatch: false, prizeMult: 0.000008},
 ];
 
 let jackpot = 4000000;
@@ -273,7 +273,6 @@ function checkPowerballMatch(winningNumbers, ticket){
 
 function getMultiplier(matchCount, powerballMatch){
     return result = PRIZE_TABLE.find(row => row.regularMatches === matchCount && row.powerballMatch=== Boolean(powerballMatch));
-
 }
 
 function getJackpot(){
