@@ -83,7 +83,7 @@ button{
     min-width:fit-content;
 }
 #winningHeading{
-    border-bottom:4px black solid;
+    border-bottom:4px var(--border-color) solid;
     display:flex;
     justify-content: space-between;
 }
@@ -92,7 +92,7 @@ button{
 }
 
 h4{
-    color: var(--border-color);
+    color: var(--muted-text-color);
 }
 
 #winningBallsSection{
@@ -125,7 +125,7 @@ h4{
 }
 
 #playerTicketSection {
-    border: 4px black solid;
+    border: 4px var(--border-color) solid;
     border-radius: 10px;
     width:80%; 
     min-width: fit-content;
@@ -143,7 +143,7 @@ h4{
     align-items:center;
     justify-content: space-between;
     padding:20px;
-    background-color:green;
+    background-color:var(--card-background-color);
     min-height:50px;
 }
 
