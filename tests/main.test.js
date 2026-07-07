@@ -1,5 +1,17 @@
 const {LottoGame, LottoPlayer, generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot} = require('../main');
 
+//Testing LottoGame class
+let game;
+let player;
+beforeEach(() => {
+    game = new LottoGame();
+    player = new LottoPlayer();
+});
+
+afterEach(() => {
+    jest.restoreAllMocks();
+})
+
 //Ball Generation Tests
 test('generate line returns 7 numbers', () => {
     const line = generateLine();
@@ -86,15 +98,15 @@ test('One match returns $0', () => {
 test('three regular matches returns minimum prize', () => {
     const ticket = [1, 2, 3, 4, 5, 6, 7];
     const winningNumbers = [1, 2, 3, 10, 11, 12, 9];
-    const expectedPrize = Math.floor(getJackpot()*getMultiplier(3, 0).prizeMult);
-    expect(calculatePrize(winningNumbers, ticket)).toEqual(expectedPrize);
+    const expectedPrize = Math.floor(game.getJackpot()*getMultiplier(3, 0).prizeMult);
+    expect(calculatePrize(winningNumbers, ticket, game.getJackpot())).toEqual(expectedPrize);
 })
 
 test('Powerball increases minimum prize', () => {
     const ticket = [1, 2, 3, 4, 5, 6, 7];
     const winningNumbers = [1, 2, 3, 10, 11, 12, 7];
-    const expectedPrize = Math.floor(getJackpot()*getMultiplier(3, 1).prizeMult);
-    expect(calculatePrize(winningNumbers, ticket)).toEqual(expectedPrize);
+    const expectedPrize = Math.floor(game.getJackpot()*getMultiplier(3, 1).prizeMult);
+    expect(calculatePrize(winningNumbers, ticket, game.getJackpot())).toEqual(expectedPrize);
 })
 
 test('Two matches returns $0', () => {
@@ -112,28 +124,18 @@ test('Powerball only returns $0', () => {
 test('Six matches no powerball returns correct prize', () => {
     const ticket = [1, 2, 3, 4, 5, 6, 7];
     const winningNumbers = [1, 2, 3, 4, 5, 6, 9];
-    const expectedPrize = Math.floor(getJackpot() * getMultiplier(6, 0).prizeMult);
-    expect(calculatePrize(winningNumbers, ticket)).toEqual(expectedPrize);
+    const expectedPrize = Math.floor(game.getJackpot() * getMultiplier(6, 0).prizeMult);
+    expect(calculatePrize(winningNumbers, ticket, game.getJackpot())).toEqual(expectedPrize);
 })
 
 test('Jackpot win returns jackpot amount', () => {
     const ticket = [1, 2, 3, 4, 5, 6, 7];
     const winningNumber =[1, 2, 3, 4, 5, 6, 7];
-    const expectedPrize = getJackpot();
-    expect(calculatePrize(winningNumber, ticket)).toEqual(expectedPrize);
+    const expectedPrize = game.getJackpot();
+    expect(calculatePrize(winningNumber, ticket, game.getJackpot())).toEqual(expectedPrize);
 })
 
-//Testing LottoGame class
-let game;
-let player;
-beforeEach(() => {
-    game = new LottoGame();
-    player = new LottoPlayer();
-});
 
-afterEach(() => {
-    jest.restoreAllMocks();
-})
 
 test('Jackpot increases', () => {
     const initialJackpot = game.getJackpot();
@@ -276,7 +278,6 @@ test('Someone else is able to win the Jackpot', () => {
 
 
 })
-
 test('When no one wins, jackpot increases', () => {
     jest.spyOn(Math, 'random').mockReturnValue(1);
     player.tickets = [[1,2,3,4,5,6,7]];

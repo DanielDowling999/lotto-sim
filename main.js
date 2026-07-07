@@ -1,4 +1,3 @@
-//Basic prototype. Game functionality will be split between a player object and game object, just wanted to test things first.
 const PRIZE_TABLE = [
     {regularMatches: 6, powerballMatch: true, prizeMult: 1},
     {regularMatches: 6, powerballMatch: false, prizeMult:0.2},
@@ -10,17 +9,18 @@ const PRIZE_TABLE = [
     {regularMatches: 3, powerballMatch: false, prizeMult: 0.000008},
 ];
 
-let jackpot = 4000000;
-let maxJackpot = 50000000;
+
 class LottoGame {
     constructor() {
         this.defaultJackpot = 4000000;
+        this.maxJackpot = 50000000;
         this.jackpot = this.defaultJackpot;
         this.drawNumber = 0;
         this.winningNumbers=[];
         this.ticketPrice = 2;
         this.basePlayers = 500000;
         this.ticketsSold = this.determineComputerTickets();
+
     }
     getJackpot(){
         return this.jackpot;
@@ -30,7 +30,7 @@ class LottoGame {
     }
 
     increaseJackpot(num = 1000000){
-        this.jackpot = Math.min(this.jackpot + num, maxJackpot);
+        this.jackpot = Math.min(this.jackpot + num, this.maxJackpot);
     }
     resetJackpot(){
         this.jackpot=this.defaultJackpot;
@@ -55,7 +55,7 @@ class LottoGame {
     }
     determineNumberOfPlayers(){
         const k = 1.584;
-        return Math.floor(this.basePlayers * ( 1 + k * Math.log10(this.jackpot/this.defaultJackpot)));        
+        return Math.floor(this.basePlayers * ( 1 + k * Math.log10(this.getJackpot()/this.defaultJackpot)));        
     }
 
     determineComputerTickets(){
@@ -83,7 +83,7 @@ class LottoGame {
         const results = player.tickets.map(ticket=>{
             const regularMatches = checkTicketMatch(winningNumbers, ticket);
             const powerballMatch = checkPowerballMatch(winningNumbers, ticket);
-            const prize = calculatePrize(winningNumbers, ticket);
+            const prize = calculatePrize(winningNumbers, ticket, this.getJackpot());
             totalPrize += prize;
             return {ticket, regularMatches, powerballMatch, prize};
         });
@@ -177,6 +177,9 @@ class LottoPlayer {
         return this.totalSpent;
 
     }
+    getTotalWon(){
+        return this.totalWon;
+    }
     updateGameOver(){
         if(this.currentMoney < 2){
             this.gameOver = true;
@@ -192,37 +195,6 @@ class LottoPlayer {
 
 }
 
-/*function playGame(){
-    const playerdiv=document.getElementById('player');
-    const lottodiv = document.getElementById('lotto');
-    const windiv = document.getElementById('win');
-
-    //Don't think these include powerball, will need to redo.
-    const odds={
-        win1: 2.60526576e-7,
-        win2: 0.00000156315,
-        win3: 0.00005158361,
-        win4: 0.00012896569,
-        win5: 0.00206185567,
-        win6: 0.00275482093,
-        win7: 0.02857142857
-    };
-
-    let winningLine = generateLine();
-    console.log("Winning line is: " + winningLine);
-    lottodiv.innerHTML=winningLine;
-
-    
-    let yourLine = generateLine();
-    console.log("Your line is: " + yourLine);
-    playerdiv.innerHTML=yourLine;
-
-    const arraysMatch = (a, b) =>
-        a.length === b.length && [...a].sort().every((val, i) => val === [...b].sort()[i]);
-
-    win = arraysMatch(yourLine, winningLine);
-    windiv.innerHTML=win;
-}*/
 
 function generateLine(){
     const ballRange = 40;
@@ -279,15 +251,17 @@ function getJackpot(){
     return jackpot;
 }
 
-function calculatePrize(winningNumbers, ticket){
+function calculatePrize(winningNumbers, ticket, gameJackpot){
     const matchCount = checkTicketMatch(winningNumbers, ticket);
     const powerballMatch = checkPowerballMatch(winningNumbers, ticket);
     const result = getMultiplier(matchCount, powerballMatch);
     if (result){
-        return Math.floor(getJackpot()*result.prizeMult);
+        return Math.floor(gameJackpot*result.prizeMult);
     }
     return 0;
     
 }
 
-module.exports = { LottoGame, LottoPlayer, generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot  };
+if (typeof module !== 'undefined'){
+    module.exports = { LottoGame, LottoPlayer, generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot  };
+}

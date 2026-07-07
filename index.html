@@ -6,6 +6,7 @@
     <title>The Lottery</title>
     <link rel="stylesheet" href="styles.css">
     <script src="main.js" defer></script>
+    <script src="ui.js" defer></script>
 </head>
 <body>
     <div id="head">
@@ -113,7 +114,7 @@
                         </div>
                     </div>
                     <div class="ticket" id="buyAnother">
-                        <button>+ BUY ANOTHER TICKET</button>
+                        <button>+ BUY A TICKET</button>
                     </div>
                     
                 </div>
@@ -154,37 +155,36 @@
                 <div id="playerInfo">
                     <div class="sideSection">
                         <h4>CURRENT MONEY</h4>
-                        $?
+                        <span id="currentMoney">$?</span>
                     </div>
                     <div class="sideSection">
                         <h4>TOTAL SPENT</h4>
-                        $?
-                        
+                        <span id="totalSpent">$?</span>
                     </div>
                     <div class="sideSection">
                         <h4>TOTAL WON</h4>
-                        $?
+                        <span id="totalWon">$?</span>
                         
                     </div>
                     <div class="sideSection">
                         <h4>TICKETS BOUGHT</h4>
-                        0
+                        <span id="ticketsBought">0</span>
                     </div>
                 </div>
                 <div id="drawInfo">
                     <div class="sideSection">
                         <!--Jackpot might instead be over winning numbers-->
-                        <h4>CURRENT Jackpot</h4>
-                        $?
+                        <h4>CURRENT JACKPOT</h4>
+                        <span id="jackpot">$?</span>
                     </div>
                     <div class="sideSection">
                         <h4>NEXT DRAW</h4>
-                        NEVER
+                        <span id="drawDate">0/0/0000</span>
                         
                     </div>
                     <div class="sideSection">
-                        <h4>Prize Breakdown</h4>
-                        
+                        <h4>PRIZE BREAKDOWN</h4>
+                        <span id="prizeBreakdown">0</span>
                         
                     </div>    
                 </div>
