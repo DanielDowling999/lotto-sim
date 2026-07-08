@@ -103,7 +103,7 @@ buyButton.addEventListener("click", () => {
     updateUI();
 })
 
-//Next is playButton.
+//Next is playButton and winning numbers. Probably in the other order.
 
 
 function updateUI(){
