@@ -96,6 +96,7 @@ function renderTicket(ticket, index){
 }
 
 buyButton.addEventListener("click", () => {
+    hideWinningNumbers();
     if (player.getMoney() < game.getPrice()) return;
     player.buyTicket(game.getPrice());
     const tickets = player.getTickets();
@@ -103,13 +104,33 @@ buyButton.addEventListener("click", () => {
     updateUI();
 })
 
-//Next is playButton and winning numbers. Probably in the other order.
+function hideWinningNumbers(){
+    const balls = winningBallsSection.querySelectorAll(".ball");
+    balls.forEach(ball=>{
+        ball.innerText = "?";
+    })
+}
 
+function displayWinningNumbers(winningNumbers){
+    const balls = winningBallsSection.querySelectorAll(".ball");
+    balls.forEach((ball, index)=>{
+        ball.innerText = winningNumbers[index];
+    })
+}
+
+playButton.addEventListener("click", () => {
+    const result = game.playGame(player, game.getWinningNumbers());
+    displayWinningNumbers(game.getWinningNumbers());
+    updateUI();
+    game.generateWinningLine();
+})
+
+//Next: Add the functionality for balls being 'matched' (highlighting them somehow), and then cleared/stored once a player buys another new ticket.
 
 function updateUI(){
     const state = game.getGameState(player);
     updateSidebar(state);
 }
 
-
+game.generateWinningLine();
 updateUI();
