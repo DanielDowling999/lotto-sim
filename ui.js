@@ -37,9 +37,15 @@ function updateTickets(tickets){
     });
 }*/
 
+function updateTickets(tickets){
+    playerTickets.innerHTML = '';
+    tickets.forEach((ticket, index) => {
+        addTicketToUI(ticket, index);
+    })
+}
 function addTicketToUI(ticket, index){
     const ticketElement = renderTicket(ticket, index);
-    playerTickets.prepend(ticketElement);
+    playerTickets.append(ticketElement);
 }
 
 function renderTicket(ticket, index){
@@ -102,6 +108,7 @@ buyButton.addEventListener("click", () => {
     const tickets = player.getTickets();
     addTicketToUI(tickets[tickets.length - 1], tickets.length -1);
     updateUI();
+    updateTickets(player.getTickets());
 })
 
 function hideWinningNumbers(){
@@ -119,17 +126,42 @@ function displayWinningNumbers(winningNumbers){
 }
 
 playButton.addEventListener("click", () => {
+    if(player.getTickets().length ===0){
+        updateTickets([]);
+    }
     const result = game.playGame(player, game.getWinningNumbers());
-    displayWinningNumbers(game.getWinningNumbers());
+    console.log('winning numbers: ', result.winningNumbers);
+    console.log('results: ', result.results);
+    displayWinningNumbers(result.winningNumbers);
+    
+    const tickets = playerTickets.querySelectorAll(".ticket");
+    result.results.forEach((ticketResult, index) => {
+        highlightMatchingNumbers(tickets[index], ticketResult.matchingNumbers, ticketResult.powerballMatch);
+    })
+
     updateUI();
     game.generateWinningLine();
 })
 
 //Next: Add the functionality for balls being 'matched' (highlighting them somehow), and then cleared/stored once a player buys another new ticket.
 
+function highlightMatchingNumbers(ticket, matchingNumbers, powerBallMatch){
+    console.log('powerBallMatch', powerBallMatch);
+    console.log('powerball element', ticket.querySelector(".powerball"));
+    ticket.querySelector('.matchedNum').innerText = `${matchingNumbers.length} matched`;
+    const balls = ticket.querySelectorAll(".ball:not(.powerball)");
+    matchingNumbers.forEach(index => {
+        balls[index].classList.add("matched");
+    })
+    if(powerBallMatch){
+        ticket.querySelector(".ballSection.powerball .ball").classList.add("matched");
+    }
+}
+
 function updateUI(){
     const state = game.getGameState(player);
     updateSidebar(state);
+    
 }
 
 game.generateWinningLine();

@@ -84,8 +84,9 @@ class LottoGame {
             const regularMatches = checkTicketMatch(winningNumbers, ticket);
             const powerballMatch = checkPowerballMatch(winningNumbers, ticket);
             const prize = calculatePrize(winningNumbers, ticket, this.getJackpot());
+            const matchingNumbers = getMatchingNumberIndex(winningNumbers, ticket);
             totalPrize += prize;
-            return {ticket, regularMatches, powerballMatch, prize};
+            return {ticket, regularMatches, powerballMatch, prize, matchingNumbers};
         });
         const jackpotWon  = results.some(r => r.regularMatches === 6 && r.powerballMatch === 1);
         player.updateMoney(totalPrize);
@@ -234,6 +235,16 @@ function checkTicketMatch(winningNumbers, ticket){
         }
     }
     return matchCount;
+}
+
+function getMatchingNumberIndex(winningNumbers, ticket){
+    const matchingNumbers = [];
+    for(let i=0; i<6; i++){
+        if(winningNumbers.slice(0,6).includes(ticket[i])){
+            matchingNumbers.push(i);
+        }
+    }
+    return matchingNumbers;
 }
 
 function checkPowerballMatch(winningNumbers, ticket){

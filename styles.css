@@ -114,6 +114,16 @@ h4{
 
 }
 
+.ball.matched{
+    border:3px solid var(--light-main-color);
+    box-shadow: 0 0 8px var(--light-main-color), 0 0 16px var(--light-main-color);
+}
+.ball.powerball.matched{
+    border:3px solid var(--powerball-color);
+    box-shadow: 0 0 8px var(--powerball-color), 0 0 16px var(--powerball-color);
+}
+
+
 #winningBallsSection .ball{
     height:100px;
     width:100px;
@@ -123,6 +133,8 @@ h4{
     background-color:var(--powerball-color);
     border-color: var(--powerball-border-color);
 }
+
+
 
 #playerTicketSection {
     border: 4px var(--border-color) solid;
