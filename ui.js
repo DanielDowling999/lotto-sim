@@ -24,10 +24,19 @@ function updateSidebar(state){
     totalWon.innerText = `$${state.totalWon}`;
     ticketsBought.innerText = `${state.ticketsBought}`;
     jackpotDisplay.innerText = `$${state.jackpot}`;
+    console.log('jackpot: ', state.jackpot);
+
+    drawDate.innerText = `${state.date}`;
+    //Note: Date needs to change so that the draw dates are on saturdays and wednesdays.
 
     //Add these later when functions are made
     /*drawDate.innerText = `${state.drawDate}`;
     prizeBreakdown.innerText = `${state.prizeBreakdown}`;*/
+}
+
+function updateDrawInfo(draw){
+    drawNumber.innerText = `${draw}`;
+
 }
 /*
 function updateTickets(tickets){
@@ -161,6 +170,8 @@ function highlightMatchingNumbers(ticket, matchingNumbers, powerBallMatch){
 function updateUI(){
     const state = game.getGameState(player);
     updateSidebar(state);
+
+    updateDrawInfo(state.drawNumber);
     
 }
 

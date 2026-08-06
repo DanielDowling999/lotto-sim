@@ -18,9 +18,17 @@ class LottoGame {
         this.drawNumber = 0;
         this.winningNumbers=[];
         this.ticketPrice = 2;
-        this.basePlayers = 500000;
+        this.basePlayers = 25000;
         this.ticketsSold = this.determineComputerTickets();
+        this.currentDate = new Date();
 
+    }
+
+    advanceDate(days=7){
+        this.currentDate.setDate(this.currentDate.getDate() + days);
+    }
+    getDate(){
+        return this.currentDate.toLocaleDateString('en-NZ', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
     }
     getJackpot(){
         return this.jackpot;
@@ -103,6 +111,7 @@ class LottoGame {
         player.clearTickets();
 
         this.updateDrawNumber();
+        this.advanceDate();
         this.updateComputerTickets();
         return {
             winningNumbers,
@@ -126,7 +135,8 @@ class LottoGame {
             ticketsBought: player.getTicketsBought(),
             playerTickets: player.getTickets(),
             ticketHistory: player.getTicketHistory(),
-            gameOver: player.getGameOver()
+            gameOver: player.getGameOver(),
+            date: this.getDate()
         }
     }
     
