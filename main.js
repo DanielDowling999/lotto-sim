@@ -3,10 +3,10 @@ const PRIZE_TABLE = [
     {regularMatches: 6, powerballMatch: false, prizeMult:0.2},
     {regularMatches: 5, powerballMatch: true, prizeMult: 0.01},
     {regularMatches: 5, powerballMatch: false, prizeMult: 0.0005},
-    {regularMatches: 4, powerballMatch: true, prizeMult: 0.0001},
-    {regularMatches: 4, powerballMatch: false, prizeMult: 0.00003},
-    {regularMatches: 3, powerballMatch: true, prizeMult:0.000016},
-    {regularMatches: 3, powerballMatch: false, prizeMult: 0.000008},
+    {regularMatches: 4, powerballMatch: true, fixedPrize: 100},
+    {regularMatches: 4, powerballMatch: false, fixedPrize: 40},
+    {regularMatches: 3, powerballMatch: true, fixedPrize: 20},
+    {regularMatches: 3, powerballMatch: false, fixedPrize: 10},
 ];
 
 
@@ -21,13 +21,33 @@ class LottoGame {
         this.basePlayers = 25000;
         this.ticketsSold = this.determineComputerTickets();
         this.currentDate = new Date();
+        this.setInitialDate();
+        this.lastDraw;
 
     }
 
     advanceDate(days=7){
         this.currentDate.setDate(this.currentDate.getDate() + days);
     }
-    getDate(){
+    advanceDraw(){
+        if (this.lastDraw === 3){
+            this.advanceDate(3);
+            this.lastDraw = 6;
+            
+        }
+        else{
+            this.advanceDate(4);
+            this.lastDraw = 3;
+        }
+    }
+    setInitialDate(){
+        //Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
+        const daysUntilDraw = [3, 2, 1, 0, 2, 1, 0];
+        this.currentDate.setDate(this.currentDate.getDate() + daysUntilDraw[this.currentDate.getDay()]);
+        this.lastDraw = this.currentDate.getDay();
+
+    }
+    getDrawDate(){
         return this.currentDate.toLocaleDateString('en-NZ', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
     }
     getJackpot(){
@@ -88,15 +108,15 @@ class LottoGame {
     playGame(player, winningNumbers = this.generateWinningLine()){
         let totalPrize = 0;
         
-        const results = player.tickets.map(ticket=>{
-            const regularMatches = checkTicketMatch(winningNumbers, ticket);
-            const powerballMatch = checkPowerballMatch(winningNumbers, ticket);
-            const prize = calculatePrize(winningNumbers, ticket, this.getJackpot());
-            const matchingNumbers = getMatchingNumberIndex(winningNumbers, ticket);
-            totalPrize += prize;
-            return {ticket, regularMatches, powerballMatch, prize, matchingNumbers};
-        });
-        const jackpotWon  = results.some(r => r.regularMatches === 6 && r.powerballMatch === 1);
+        player.tickets.forEach(ticket=>{
+            ticket.regularMatches = checkTicketMatch(winningNumbers, ticket.numbers);
+            ticket.powerballMatch = checkPowerballMatch(winningNumbers, ticket.numbers);
+            ticket.prize = calculatePrize(winningNumbers, ticket.numbers, this.getJackpot());
+            ticket.matchingIndices = getMatchingNumberIndex(winningNumbers, ticket.numbers);
+            totalPrize += ticket.prize;
+        })
+
+        const jackpotWon = player.tickets.some(ticket => ticket.regularMatches === 6 && ticket.powerballMatch === 1);
         player.updateMoney(totalPrize);
         
         const someoneElseWins = this.someoneWinsJackpot();
@@ -111,11 +131,10 @@ class LottoGame {
         player.clearTickets();
 
         this.updateDrawNumber();
-        this.advanceDate();
+        this.advanceDraw();
         this.updateComputerTickets();
         return {
             winningNumbers,
-            results,
             totalPrize,
             jackpotWon,
             gameOver: player.getGameOver()
@@ -136,7 +155,7 @@ class LottoGame {
             playerTickets: player.getTickets(),
             ticketHistory: player.getTicketHistory(),
             gameOver: player.getGameOver(),
-            date: this.getDate()
+            date: this.getDrawDate()
         }
     }
     
@@ -159,11 +178,12 @@ class LottoPlayer {
         this.tickets.push(ticket);
     }
     buyTicket(price = 2){
-        const ticket = generateLine();
+        this.ticketsBought+=1;
+        const ticket = new LottoTicket(generateLine(), this.ticketsBought);
         this.addTicket(ticket);
         this.updateMoney(-price);
         this.totalSpent+=price;
-        this.ticketsBought+=1;
+  
     }
     updateMoney(amount){
         this.currentMoney+=amount;
@@ -206,6 +226,17 @@ class LottoPlayer {
 
 }
 
+class LottoTicket {
+    constructor(numbers, id){
+        this.numbers = numbers;
+        this.id = id;
+        this.prize = 0;
+        this.regularMatches =0;
+        this.powerballMatch = 0;
+        this.matchingIndices = [];
+    }
+}
+
 
 function generateLine(){
     const ballRange = 40;
@@ -240,7 +271,7 @@ function shuffleArrayAndSlice(count, max){
 function checkTicketMatch(winningNumbers, ticket){
     let matchCount = 0;
     for(let i =0; i< 6; i++){
-        if (winningNumbers.includes(ticket[i])){
+        if (winningNumbers.slice(0,6).includes(ticket[i])){
             matchCount+=1;
         }
     }
@@ -265,7 +296,7 @@ function checkPowerballMatch(winningNumbers, ticket){
 }
 
 function getMultiplier(matchCount, powerballMatch){
-    return result = PRIZE_TABLE.find(row => row.regularMatches === matchCount && row.powerballMatch=== Boolean(powerballMatch));
+    return PRIZE_TABLE.find(row => row.regularMatches === matchCount && row.powerballMatch=== Boolean(powerballMatch));
 }
 
 function getJackpot(){
@@ -277,6 +308,7 @@ function calculatePrize(winningNumbers, ticket, gameJackpot){
     const powerballMatch = checkPowerballMatch(winningNumbers, ticket);
     const result = getMultiplier(matchCount, powerballMatch);
     if (result){
+        if (result.fixedPrize) return result.fixedPrize;
         return Math.floor(gameJackpot*result.prizeMult);
     }
     return 0;
@@ -284,5 +316,5 @@ function calculatePrize(winningNumbers, ticket, gameJackpot){
 }
 
 if (typeof module !== 'undefined'){
-    module.exports = { LottoGame, LottoPlayer, generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot  };
+    module.exports = { LottoGame, LottoPlayer, LottoTicket, generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot  };
 }

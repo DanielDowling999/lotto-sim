@@ -1,11 +1,13 @@
-const {LottoGame, LottoPlayer, generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot} = require('../main');
+const {LottoGame, LottoPlayer, LottoTicket, generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot} = require('../main');
 
 //Testing LottoGame class
 let game;
 let player;
+let ticket;
 beforeEach(() => {
     game = new LottoGame();
     player = new LottoPlayer();
+    ticket = new LottoTicket([1,2,3,4,5,6,7], 1);
 });
 
 afterEach(() => {
@@ -98,14 +100,14 @@ test('One match returns $0', () => {
 test('three regular matches returns minimum prize', () => {
     const ticket = [1, 2, 3, 4, 5, 6, 7];
     const winningNumbers = [1, 2, 3, 10, 11, 12, 9];
-    const expectedPrize = Math.floor(game.getJackpot()*getMultiplier(3, 0).prizeMult);
+    const expectedPrize = 10;
     expect(calculatePrize(winningNumbers, ticket, game.getJackpot())).toEqual(expectedPrize);
 })
 
 test('Powerball increases minimum prize', () => {
     const ticket = [1, 2, 3, 4, 5, 6, 7];
     const winningNumbers = [1, 2, 3, 10, 11, 12, 7];
-    const expectedPrize = Math.floor(game.getJackpot()*getMultiplier(3, 1).prizeMult);
+    const expectedPrize = 20;
     expect(calculatePrize(winningNumbers, ticket, game.getJackpot())).toEqual(expectedPrize);
 })
 
@@ -158,8 +160,9 @@ test('playGame returns a winning line of numbers', () => {
 test('jackpot resets on win', () => {
     const initialJackpot = game.getJackpot();
     game.increaseJackpot(10000000);
-    player.tickets.push([1, 2, 3, 4, 5, 6, 7]);
+    player.tickets.push(new LottoTicket([1,2,3,4,5,6,7], 1));
     game.playGame(player, [1, 2, 3, 4, 5, 6, 7]);
+    
     expect(game.getJackpot()).toEqual(initialJackpot);
 
 })
@@ -167,7 +170,7 @@ test('jackpot resets on win', () => {
 test('jackpot increases on non-jackpot result', () => {
     jest.spyOn(Math, 'random').mockReturnValue(1);
     const initialJackpot = game.getJackpot();
-    player.tickets.push([1,2,3,4,5,6,7]);
+    player.tickets.push(new LottoTicket([1,2,3,4,5,6,7], 1));
     game.playGame(player,[8,9,10,11,12,13,10]);
     expect(game.getJackpot()).toEqual(initialJackpot + 1000000);
 
@@ -175,7 +178,7 @@ test('jackpot increases on non-jackpot result', () => {
 
 test('player money increases on win', () => {
     const initialMoney = player.getMoney();
-    player.tickets.push([1,2,3,4,5,6,7]);
+    player.tickets.push(new LottoTicket([1,2,3,4,5,6,7], 1));
     game.playGame(player, [1,2,3,4,5,6,7]);
     expect(player.getMoney()).toBeGreaterThan(initialMoney);
 })
@@ -189,7 +192,7 @@ test('Player money decreases when buying a ticket', () => {
 
 test('Player money increases when winning a prize', () => {
     const initialMoney = player.getMoney();
-    player.tickets.push([1,2,3,4,5,6,7]);
+    player.tickets.push(new LottoTicket([1,2,3,4,5,6,7], 1));
     game.playGame(player, [1,2,3,4,5,6,7]);
     expect(player.getMoney()).toBeGreaterThan(initialMoney);
 })
@@ -198,15 +201,15 @@ test('Player total spent and total won are tracked correctly', () => {
     const ticketPrice = game.getPrice();
     player.buyTicket(ticketPrice);
     expect(player.totalSpent).toEqual(ticketPrice);
-    player.tickets.push([1,2,3,4,5,6,7]);
+    player.tickets.push(new LottoTicket([1,2,3,4,5,6,7], 1));
     game.playGame(player, [1,2,3,4,5,6,7]);
     expect(player.totalWon).toBeGreaterThan(0);
 })
 test('jackpot is won if any ticket wins, not just the last', () => {
     const winningNumbers = [1, 2, 3, 4, 5, 6, 7];
     player.tickets = [
-        [1, 2, 3, 4, 5, 6, 7], // jackpot winner
-        [8, 9, 10, 11, 12, 13, 9] // no match — this was overwriting jackpotWon
+        new LottoTicket([1,2,3,4,5,6,7], 1),
+        new LottoTicket([8,9,10,11,12,13,9], 2)
     ];
     game.playGame(player, winningNumbers);
     expect(game.getJackpot()).toEqual(game.defaultJackpot); // should have reset
@@ -214,34 +217,34 @@ test('jackpot is won if any ticket wins, not just the last', () => {
 
 test('playGame returns correct game over status', () => {
     player.currentMoney = 0; 
-    player.tickets = [[1,2,3,4,5,6,9]];
+    player.tickets = [new LottoTicket([1,2,3,4,5,6,7], 1)];
     const result = game.playGame(player, [8, 9, 10, 11, 12, 13, 9]); // No win
     expect(player.getGameOver()).toBe(true); // Player should be out of money
 });
 
 test('tickets are cleared after each game', () => {
-    player.tickets = [[1,2,3,4,5,6, 9]];
+    player.tickets = [new LottoTicket([1,2,3,4,5,6, 9], 1)];
     game.playGame(player, [8, 9, 10, 11, 12, 13, 9]);
     expect(player.tickets).toHaveLength(0);
 })
 
 test('cleared tickets are stored in ticket history', () => {
-    player.tickets = [[1,2,3,4,5,6,9]];
+    player.tickets = [new LottoTicket([1,2,3,4,5,6,9], 1)];
     game.playGame(player, [8, 9, 10, 11, 12, 13, 9]);
     let ticketHistory = player.getTicketHistory();
     expect(ticketHistory).toHaveLength(1);
-    expect(ticketHistory[0]).toEqual([[1,2,3,4,5,6,9]]);
+    expect(ticketHistory[0][0].numbers).toEqual([1,2,3,4,5,6,9]);
 })
 
 test('cleared tickets are stored over multiple rounds', () => {
-    player.tickets = [[1,2,3,4,5,6,9]];
+    player.tickets = [new LottoTicket([1,2,3,4,5,6,9], 1)];
     game.playGame(player, [8,9,10,11,12,13, 9]);
-    player.tickets = [[2,6,21,22,23,24,1]];
+    player.tickets = [new LottoTicket([2,6,21,22,23,24,1], 2)];
     game.playGame(player, [1,2,3,4,5,6,7]);
     let ticketHistory = player.getTicketHistory();
     expect(ticketHistory).toHaveLength(2);
-    expect(ticketHistory[0]).toEqual([[1,2,3,4,5,6,9]]);
-    expect(ticketHistory[1]).toEqual([[2,6,21,22,23,24,1]]);
+    expect(ticketHistory[0][0].numbers).toEqual([1,2,3,4,5,6,9]);
+    expect(ticketHistory[1][0].numbers).toEqual([2,6,21,22,23,24,1]);
 })
 
 test('determineNumberOfPlayers returns an amount of players', () => {
@@ -271,7 +274,7 @@ test('Total tickets sold increase when player buys a ticket', () => {
 
 test('Someone else is able to win the Jackpot', () => {
     jest.spyOn(Math, 'random').mockReturnValue(0);
-    player.tickets  = [[1, 2, 3, 4, 5, 6, 7]];
+    player.tickets  = [new LottoTicket([1,2,3,4,5,6,7], 1)];
     game.playGame(player, [8, 9, 10, 11, 12, 13, 9]);
 
     expect(game.getJackpot()).toEqual(game.defaultJackpot);
@@ -280,7 +283,7 @@ test('Someone else is able to win the Jackpot', () => {
 })
 test('When no one wins, jackpot increases', () => {
     jest.spyOn(Math, 'random').mockReturnValue(1);
-    player.tickets = [[1,2,3,4,5,6,7]];
+    player.tickets = [new LottoTicket([1, 2, 3, 4, 5, 6, 7], 1)];
     game.playGame(player, [8,9,10,11,12,13,9]);
     expect(game.getJackpot()).toEqual(game.defaultJackpot + 1000000);
 })
