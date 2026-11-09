@@ -22,6 +22,7 @@ const ticketsBought = document.getElementById("ticketsBought");
 const jackpotDisplay = document.getElementById("jackpot");
 const drawDate = document.getElementById("drawDate");
 const prizeBreakdown = document.getElementById("prizeBreakdown");
+const mustBeWonLabel = document.getElementById("mustBeWon");
  
 function formatMoney(amount) {
     return `$${amount.toLocaleString('en-NZ')}`;
@@ -34,17 +35,30 @@ function updateSidebar(state) {
     ticketsBought.innerText = `${state.ticketsBought.toLocaleString('en-NZ')}`;
     jackpotDisplay.innerText = formatMoney(state.jackpot);
     drawDate.innerText = `${state.date}`;
+    mustBeWonLabel.hidden = !state.mustBeWon;
 }
 
 function prizeLabel(row) {
     return `${row.regularMatches}${row.powerballMatch ? ' + <span class="pb">PB</span>' : ''}`;
 }
 
-function updatePrizeBreakdown(jackpot) {
+function prizeAmountText(row) {
+    if (row.includesJackpot) return `Jackpot + ${formatMoney(row.cash)}`;
+    if (row.bonusTicket) return row.cash > 0 ? `${formatMoney(row.cash)} + bonus ticket` : 'Bonus ticket';
+    return formatMoney(row.cash);
+}
+
+function updatePrizeBreakdown() {
     prizeBreakdown.innerHTML = PRIZE_TABLE.map(row => {
-        const amount = row.fixedPrize ?? Math.floor(jackpot * row.prizeMult);
-        return `<tr><td>${prizeLabel(row)}</td><td>${formatMoney(amount)}</td></tr>`;
+        return `<tr><td>${prizeLabel(row)}</td><td>${prizeAmountText(row)}</td></tr>`;
     }).join('');
+}
+
+function ticketResultText(ticket) {
+    if (ticket.prize > 0) {
+        return `Won ${formatMoney(ticket.prize)}${ticket.bonusTicket ? ' + bonus ticket' : ''}`;
+    }
+    return ticket.bonusTicket ? 'Bonus ticket' : 'No prize';
 }
  
 function updateDrawInfo(draw) {
@@ -116,7 +130,7 @@ function renderTicket(ticket) {
  
     const ticketCost = document.createElement("div");
     ticketCost.classList.add("ticketCost");
-    ticketCost.innerText = formatMoney(game.getPrice());
+    ticketCost.innerText = ticket.isBonus ? "Free" : formatMoney(game.getPrice());
  
     ticketEnd.appendChild(matchedNum);
     ticketEnd.appendChild(ticketCost);
@@ -138,14 +152,13 @@ function updateTickets(tickets) {
 function highlightMatchingNumbers(ticketElement, ticket) {
     // Update match count
     ticketElement.classList.add("drawn");
-    ticketElement.classList.toggle("winner", ticket.prize > 0);
+    ticketElement.classList.toggle("winner", ticket.prize > 0 || ticket.bonusTicket);
 
     const powerballText = ticket.powerballMatch ? ' + Powerball' : '';
     ticketElement.querySelector('.matchedNum').innerText = `${ticket.regularMatches} matched${powerballText}`;
  
     // Update prize
-    ticketElement.querySelector('.ticketCost').innerText = 
-        ticket.prize > 0 ? `Won ${formatMoney(ticket.prize)}` : 'No prize';
+    ticketElement.querySelector('.ticketCost').innerText = ticketResultText(ticket);
  
     // Highlight regular balls
     const balls = ticketElement.querySelectorAll(".ball:not(.powerball)");
@@ -162,7 +175,7 @@ function highlightMatchingNumbers(ticketElement, ticket) {
 // ── Master update ─────────────────────────────────────────────────────────────
 
 function updateButtons(state) {
-    const canAfford = state.playerMoney >= game.getPrice();
+    const canAfford = player.canBuyTicket(game.getPrice());
     buyButton.classList.toggle("disabled", !canAfford);
     playButton.classList.toggle("disabled", state.playerTickets.length === 0);
     playButton.innerText = state.gameOver && state.playerTickets.length === 0
@@ -175,19 +188,19 @@ function updateUI() {
     updateSidebar(state);
     updateDrawInfo(state.drawNumber);
     updateButtons(state);
-    updatePrizeBreakdown(state.jackpot);
+    updatePrizeBreakdown();
 }
 
 // ── Event listeners ───────────────────────────────────────────────────────────
 
 buyButton.addEventListener("click", () => {
-    if (player.getMoney() < game.getPrice()) return;
+    if (!player.canBuyTicket(game.getPrice())) return;
     // First ticket of a new draw: clear last draw's results from the screen
     if (player.getTickets().length === 0) {
         hideWinningNumbers();
         playerTickets.innerHTML = '';
     }
-    player.buyTicket(game.getPrice());
+    game.sellTicket(player);
     const tickets = player.getTickets();
     addTicketToUI(tickets[tickets.length - 1]);
     updateUI();

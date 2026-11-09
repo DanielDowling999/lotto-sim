@@ -208,6 +208,20 @@ h1, h3{
     border-radius:999px;
 }
 
+/* Gold on purple, shown when the jackpot is capped and the draw must pay out */
+.mustBeWon{
+    display:inline-block;
+    margin-bottom:10px;
+    background:var(--gold);
+    color:var(--brand-deep);
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+}
+
+.mustBeWon[hidden]{
+    display:none;
+}
+
 /* ── Balls ──────────────────────────────────────────────────────────────── */
 
 .ball{
