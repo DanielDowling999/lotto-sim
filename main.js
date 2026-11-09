@@ -1,3 +1,20 @@
+const BALL_RANGE = 40;
+const POWERBALL_RANGE = 10;
+const BALLS_PER_LINE = 6;
+
+function combinations(n, k){
+    let result = 1;
+    for (let i = 1; i <= k; i++){
+        result = result * (n - k + i) / i;
+    }
+    return Math.round(result);
+}
+
+// 6 from 40 = 3,838,380 combinations. The jackpot also needs the Powerball (1 in 10),
+// so first division odds are 1 in 38,383,800.
+const LOTTO_ODDS = combinations(BALL_RANGE, BALLS_PER_LINE);
+const JACKPOT_ODDS = LOTTO_ODDS * POWERBALL_RANGE;
+
 const PRIZE_TABLE = [
     {regularMatches: 6, powerballMatch: true, prizeMult: 1},
     {regularMatches: 6, powerballMatch: false, prizeMult:0.2},
@@ -99,7 +116,7 @@ class LottoGame {
     }
 
     someoneWinsJackpot(){
-        const oddsPerTicket = 1/3838380;
+        const oddsPerTicket = 1/JACKPOT_ODDS;
         const probSomeoneWins = 1 - Math.pow(1-oddsPerTicket, this.ticketsSold);
         return Math.random() < probSomeoneWins;
     }
@@ -127,7 +144,7 @@ class LottoGame {
             this.increaseJackpot();
 
         }
-        player.updateGameOver();
+        player.updateGameOver(this.getPrice());
         player.clearTickets();
 
         this.updateDrawNumber();
@@ -211,8 +228,8 @@ class LottoPlayer {
     getTotalWon(){
         return this.totalWon;
     }
-    updateGameOver(){
-        if(this.currentMoney < 2){
+    updateGameOver(price = 2){
+        if(this.currentMoney < price){
             this.gameOver = true;
         }
         else{
@@ -239,13 +256,8 @@ class LottoTicket {
 
 
 function generateLine(){
-    const ballRange = 40;
-    const powerBallRange = 10;
-    const ballNo  = 6;
-    let balls=[];
-
-    balls = shuffleArrayAndSlice(ballNo, ballRange);
-    balls.push(shuffleArrayAndSlice(1, powerBallRange)[0]);
+    const balls = shuffleArrayAndSlice(BALLS_PER_LINE, BALL_RANGE);
+    balls.push(generateBall(POWERBALL_RANGE));
 
     return balls;
 }
@@ -299,10 +311,6 @@ function getMultiplier(matchCount, powerballMatch){
     return PRIZE_TABLE.find(row => row.regularMatches === matchCount && row.powerballMatch=== Boolean(powerballMatch));
 }
 
-function getJackpot(){
-    return jackpot;
-}
-
 function calculatePrize(winningNumbers, ticket, gameJackpot){
     const matchCount = checkTicketMatch(winningNumbers, ticket);
     const powerballMatch = checkPowerballMatch(winningNumbers, ticket);
@@ -316,5 +324,5 @@ function calculatePrize(winningNumbers, ticket, gameJackpot){
 }
 
 if (typeof module !== 'undefined'){
-    module.exports = { LottoGame, LottoPlayer, LottoTicket, generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot  };
+    module.exports = { LottoGame, LottoPlayer, LottoTicket, generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, combinations, LOTTO_ODDS, JACKPOT_ODDS };
 }

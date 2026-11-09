@@ -1,4 +1,4 @@
-const {LottoGame, LottoPlayer, LottoTicket, generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, getJackpot} = require('../main');
+const {LottoGame, LottoPlayer, LottoTicket, generateLine, shuffleArrayAndSlice, generateBall, checkTicketMatch, checkPowerballMatch, calculatePrize, getMultiplier, combinations, LOTTO_ODDS, JACKPOT_ODDS} = require('../main');
 
 //Testing LottoGame class
 let game;
@@ -286,4 +286,21 @@ test('When no one wins, jackpot increases', () => {
     player.tickets = [new LottoTicket([1, 2, 3, 4, 5, 6, 7], 1)];
     game.playGame(player, [8,9,10,11,12,13,9]);
     expect(game.getJackpot()).toEqual(game.defaultJackpot + 1000000);
+})
+
+test('Lotto odds are 1 in 3,838,380 (6 from 40)', () => {
+    expect(combinations(40, 6)).toEqual(3838380);
+    expect(LOTTO_ODDS).toEqual(3838380);
+})
+
+test('Jackpot odds include the Powerball (1 in 38,383,800)', () => {
+    expect(JACKPOT_ODDS).toEqual(38383800);
+})
+
+test('Game over uses the ticket price', () => {
+    player.currentMoney = 4;
+    player.updateGameOver(5);
+    expect(player.getGameOver()).toBe(true);
+    player.updateGameOver(2);
+    expect(player.getGameOver()).toBe(false);
 })

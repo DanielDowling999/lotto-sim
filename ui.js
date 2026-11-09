@@ -23,12 +23,16 @@ const jackpotDisplay = document.getElementById("jackpot");
 const drawDate = document.getElementById("drawDate");
 const prizeBreakdown = document.getElementById("prizeBreakdown");
  
+function formatMoney(amount) {
+    return `$${amount.toLocaleString('en-NZ')}`;
+}
+
 function updateSidebar(state) {
-    currentMoney.innerText = `$${state.playerMoney}`;
-    totalSpent.innerText   = `$${state.totalSpent}`;
-    totalWon.innerText     = `$${state.totalWon}`;
-    ticketsBought.innerText = `${state.ticketsBought}`;
-    jackpotDisplay.innerText = `$${state.jackpot}`;
+    currentMoney.innerText = formatMoney(state.playerMoney);
+    totalSpent.innerText   = formatMoney(state.totalSpent);
+    totalWon.innerText     = formatMoney(state.totalWon);
+    ticketsBought.innerText = `${state.ticketsBought.toLocaleString('en-NZ')}`;
+    jackpotDisplay.innerText = formatMoney(state.jackpot);
     drawDate.innerText = `${state.date}`;
 }
  
@@ -95,7 +99,7 @@ function renderTicket(ticket) {
  
     const ticketCost = document.createElement("div");
     ticketCost.classList.add("ticketCost");
-    ticketCost.innerText = `$${game.getPrice()}`;
+    ticketCost.innerText = formatMoney(game.getPrice());
  
     ticketEnd.appendChild(matchedNum);
     ticketEnd.appendChild(ticketCost);
@@ -116,11 +120,12 @@ function updateTickets(tickets) {
 }
 function highlightMatchingNumbers(ticketElement, ticket) {
     // Update match count
-    ticketElement.querySelector('.matchedNum').innerText = `${ticket.matchingIndices.length} matched`;
+    const powerballText = ticket.powerballMatch ? ' + Powerball' : '';
+    ticketElement.querySelector('.matchedNum').innerText = `${ticket.regularMatches} matched${powerballText}`;
  
     // Update prize
     ticketElement.querySelector('.ticketCost').innerText = 
-        ticket.prize > 0 ? `Won $${ticket.prize}` : `$${game.getPrice()}`;
+        ticket.prize > 0 ? `Won ${formatMoney(ticket.prize)}` : 'No prize';
  
     // Highlight regular balls
     const balls = ticketElement.querySelectorAll(".ball:not(.powerball)");
@@ -136,28 +141,43 @@ function highlightMatchingNumbers(ticketElement, ticket) {
 
 // ── Master update ─────────────────────────────────────────────────────────────
 
+function updateButtons(state) {
+    const canAfford = state.playerMoney >= game.getPrice();
+    buyButton.classList.toggle("disabled", !canAfford);
+    playButton.classList.toggle("disabled", state.playerTickets.length === 0);
+    playButton.innerText = state.gameOver && state.playerTickets.length === 0
+        ? "Out of money - game over"
+        : "Play!";
+}
+
 function updateUI() {
     const state = game.getGameState(player);
     updateSidebar(state);
     updateDrawInfo(state.drawNumber);
+    updateButtons(state);
 }
 
 // ── Event listeners ───────────────────────────────────────────────────────────
 
 buyButton.addEventListener("click", () => {
     if (player.getMoney() < game.getPrice()) return;
-    hideWinningNumbers();
+    // First ticket of a new draw: clear last draw's results from the screen
+    if (player.getTickets().length === 0) {
+        hideWinningNumbers();
+        playerTickets.innerHTML = '';
+    }
     player.buyTicket(game.getPrice());
     const tickets = player.getTickets();
     addTicketToUI(tickets[tickets.length - 1]);
     updateUI();
-    updateTickets(player.getTickets());
 
 });
 
 playButton.addEventListener("click", () => {
  
-    const result = game.playGame(player, game.getWinningNumbers());
+    // Can't draw without tickets (also stops old tickets being re-highlighted against new numbers)
+    if (player.getTickets().length === 0) return;
+    const result = game.playGame(player);
     displayWinningNumbers(result.winningNumbers);
  
     // Highlight each ticket using updated ticket objects
@@ -167,10 +187,8 @@ playButton.addEventListener("click", () => {
     });
  
     updateUI();
-    game.generateWinningLine();
 });
 
 // ── Init ──────────────────────────────────────────────────────────────────────
  
-game.generateWinningLine();
 updateUI();
