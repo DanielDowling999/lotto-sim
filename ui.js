@@ -35,6 +35,17 @@ function updateSidebar(state) {
     jackpotDisplay.innerText = formatMoney(state.jackpot);
     drawDate.innerText = `${state.date}`;
 }
+
+function prizeLabel(row) {
+    return `${row.regularMatches}${row.powerballMatch ? ' + <span class="pb">PB</span>' : ''}`;
+}
+
+function updatePrizeBreakdown(jackpot) {
+    prizeBreakdown.innerHTML = PRIZE_TABLE.map(row => {
+        const amount = row.fixedPrize ?? Math.floor(jackpot * row.prizeMult);
+        return `<tr><td>${prizeLabel(row)}</td><td>${formatMoney(amount)}</td></tr>`;
+    }).join('');
+}
  
 function updateDrawInfo(draw) {
     drawNumber.innerText = `${draw}`;
@@ -43,12 +54,18 @@ function updateDrawInfo(draw) {
 function hideWinningNumbers() {
     winningBallsSection.querySelectorAll(".ball").forEach(ball => {
         ball.innerText = "?";
+        ball.classList.remove("revealed");
     });
 }
- 
+
 function displayWinningNumbers(winningNumbers) {
     winningBallsSection.querySelectorAll(".ball").forEach((ball, index) => {
         ball.innerText = winningNumbers[index];
+        // Restart the pop animation, one ball after another
+        ball.classList.remove("revealed");
+        void ball.offsetWidth;
+        ball.style.animationDelay = `${index * 0.12}s`;
+        ball.classList.add("revealed");
     });
 }
 
@@ -95,7 +112,7 @@ function renderTicket(ticket) {
  
     const matchedNum = document.createElement("div");
     matchedNum.classList.add("matchedNum");
-    matchedNum.innerText = `? matched`;
+    matchedNum.innerText = `Waiting for draw`;
  
     const ticketCost = document.createElement("div");
     ticketCost.classList.add("ticketCost");
@@ -120,6 +137,9 @@ function updateTickets(tickets) {
 }
 function highlightMatchingNumbers(ticketElement, ticket) {
     // Update match count
+    ticketElement.classList.add("drawn");
+    ticketElement.classList.toggle("winner", ticket.prize > 0);
+
     const powerballText = ticket.powerballMatch ? ' + Powerball' : '';
     ticketElement.querySelector('.matchedNum').innerText = `${ticket.regularMatches} matched${powerballText}`;
  
@@ -155,6 +175,7 @@ function updateUI() {
     updateSidebar(state);
     updateDrawInfo(state.drawNumber);
     updateButtons(state);
+    updatePrizeBreakdown(state.jackpot);
 }
 
 // ── Event listeners ───────────────────────────────────────────────────────────

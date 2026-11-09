@@ -4,154 +4,124 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Lottery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,400;0,600;0,800;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="main.js" defer></script>
     <script src="ui.js" defer></script>
 </head>
 <body>
-    <div id="head">
+    <header id="head">
         <div id="logoSection">
-            <h1 id="heading">TheLottery</h1>
-            <h2 id="subHeading">TRY YOUR LUCK</h2>
+            <span class="logoBall" aria-hidden="true"></span>
+            <div>
+                <h1 id="heading">TheLottery</h1>
+                <p id="subHeading">Try your luck</p>
+            </div>
         </div>
-        <div id="navSection">
-            <nav>
-                <ul>
-                    <!--These will bring up modal windows in front-->
-                    <li><button>HOW TO PLAY</button></li>
-                    <li><button>RESULTS</button></li>
-                    <li><button>SETTINGS</button></li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-    <div id="mainContent">
+        <nav id="navSection">
+            <ul>
+                <!--These will bring up modal windows in front-->
+                <li><button>How to play</button></li>
+                <li><button>Results</button></li>
+                <li><button>Settings</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="hero">
+        <p class="eyebrow">This draw's jackpot</p>
+        <p id="jackpot" class="jackpotAmount">$?</p>
+        <p class="drawWhen">Next draw: <span id="drawDate">-</span></p>
+    </section>
+
+    <main id="mainContent">
         <div id="main">
-            <div id="winningNumberSection">
-                <div id ="winningHeading">
-                    <h3>* WINNING NUMBERS</h3>
-                    <h4>DRAW #<span id="drawNumber">0</span></h4>
+            <section id="winningNumberSection" class="card">
+                <div id="winningHeading" class="cardHeading">
+                    <h3>Winning numbers</h3>
+                    <span class="pill">Draw #<span id="drawNumber">0</span></span>
                 </div>
                 <div id="winningBallsSection">
-                    <div class="ballSection">
-                        <div class="ball">
-                            ?
-                        </div>
-                    </div>
-                    <div class="ballSection">
-                        <div class="ball">
-                            ?
-                        </div>  
-                    </div>
-                    <div class="ballSection">
-                        <div class="ball">
-                            ?
-                        </div>
-                    </div>
-                    <div class="ballSection">
-                        <div class="ball">
-                            ?
-                        </div>
-                    </div>
-                    <div class="ballSection">
-                        <div class="ball">
-                            ?
-                        </div>
-                    </div>
-                    <div class="ballSection">
-                        <div class="ball">
-                            ?
-                        </div>
-                    </div>
-                    <div class="ballSection powerball">
-                        <div class="ball powerball">
-                            ?
-                        </div>
-                    </div>
+                    <div class="ballSection"><div class="ball">?</div></div>
+                    <div class="ballSection"><div class="ball">?</div></div>
+                    <div class="ballSection"><div class="ball">?</div></div>
+                    <div class="ballSection"><div class="ball">?</div></div>
+                    <div class="ballSection"><div class="ball">?</div></div>
+                    <div class="ballSection"><div class="ball">?</div></div>
+                    <div class="ballSection powerball"><div class="ball powerball">?</div></div>
                 </div>
+            </section>
 
-            </div>
-            <div id="playerTicketSection">
-                <h3>* YOUR TICKETS</h3>
+            <section id="playerTicketSection" class="card">
+                <div class="cardHeading">
+                    <h3>Your tickets</h3>
+                </div>
+                <div id="playerTickets"></div>
                 <div class="ticket" id="buyAnother">
-                    <button>+ BUY A TICKET</button>
+                    <button>+ Buy a ticket</button>
                 </div>
-                <div id="playerTickets">
-                </div>
+            </section>
 
-
-            </div>
             <div id="nextWeekSection">
                 <button id="play">Play!</button>
             </div>
 
             <div id="winSection">
-                <div id="latestWin">
-
-                </div>
-                <div id="allTicketsTab">
-
-                </div>
+                <div id="latestWin"></div>
+                <div id="allTicketsTab"></div>
             </div>
 
-            <div id="newsSection">
-                <h3>* LATEST NEWS</h3>
+            <section id="newsSection" class="card">
+                <div class="cardHeading">
+                    <h3>Latest news</h3>
+                </div>
                 <div id="newsBar">
-                    <!--Will update whenever 
+                    <!--Will update whenever
                     - Jackpot reaches a certain amount (And then every week after)
                     - Someone wins
                     - You lose a certain amount of money-->
-                    <div class="newsBox">
-                        <div class="newsHead"></div>
-                        <div class="newsBlurb"></div>
-                        <div class="newsFoot"></div>
-                    </div>
+                    <p class="narrator">Nothing yet.</p>
                 </div>
-            </div>
+            </section>
         </div>
-        <div id="sideBar">
-            <div id="sideHeading">
-                <h3>* YOUR STATS</h3>
-            </div>
-            <div id="sideContent">
+
+        <aside id="sideBar">
+            <section class="card">
+                <div id="sideHeading" class="cardHeading">
+                    <h3>Your stats</h3>
+                </div>
                 <div id="playerInfo">
                     <div class="sideSection">
-                        <h4>CURRENT MONEY</h4>
+                        <h4>Current money</h4>
                         <span id="currentMoney">$?</span>
                     </div>
                     <div class="sideSection">
-                        <h4>TOTAL SPENT</h4>
+                        <h4>Total spent</h4>
                         <span id="totalSpent">$?</span>
                     </div>
                     <div class="sideSection">
-                        <h4>TOTAL WON</h4>
+                        <h4>Total won</h4>
                         <span id="totalWon">$?</span>
-                        
                     </div>
                     <div class="sideSection">
-                        <h4>TICKETS BOUGHT</h4>
+                        <h4>Tickets bought</h4>
                         <span id="ticketsBought">0</span>
                     </div>
                 </div>
-                <div id="drawInfo">
-                    <div class="sideSection">
-                        <!--Jackpot might instead be over winning numbers-->
-                        <h4>CURRENT JACKPOT</h4>
-                        <span id="jackpot">$?</span>
-                    </div>
-                    <div class="sideSection">
-                        <h4>NEXT DRAW</h4>
-                        <span id="drawDate">0/0/0000</span>
-                        
-                    </div>
-                    <div class="sideSection">
-                        <h4>PRIZE BREAKDOWN</h4>
-                        <span id="prizeBreakdown">0</span>
-                        
-                    </div>    
+            </section>
+            <section class="card">
+                <div class="cardHeading">
+                    <h3>Prize breakdown</h3>
                 </div>
-            </div>
-        </div>
-    </div>
+                <table id="prizeBreakdown"></table>
+            </section>
+        </aside>
+    </main>
+
+    <footer id="foot">
+        <p>A simulation for learning about lottery odds. Not affiliated with any lottery operator. If gambling is causing you harm, the Gambling Helpline is free on 0800 654 655</p>
+    </footer>
 </body>
 </html>
